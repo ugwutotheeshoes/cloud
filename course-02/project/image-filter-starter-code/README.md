@@ -48,4 +48,4 @@ Add your own domain name and have it point to the running services (try adding a
 > !NOTE: Domain names are not included in AWS’ free tier and will incur a cost.
 
 ### Project Link
-Deployed Elastic Beanstalk Link:http://udagramug-dev4.us-east-1.elasticbeanstalk.com/
+Deployed Elastic Beanstalk Link: http://udagramug-dev4.us-east-1.elasticbeanstalk.com/
