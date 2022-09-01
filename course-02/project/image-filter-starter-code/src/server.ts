@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request, Response, request } from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { filterImageFromURL, deleteLocalFiles } from './util/util';
 
 (async () => {
 
@@ -9,7 +9,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   // Set the network port
   const port = process.env.PORT || 8082;
-  
+
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
@@ -29,18 +29,40 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   /**************************************************************************** */
 
-  //! END @TODO1
-  
-  // Root Endpoint
-  // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
-  } );
-  
+  // TODO 1
+  app.get("/filteredimage", async (req: Request , res: Response) => {
+    const  image_url :string = req.query.image_url as string;
+    // const { image_url }: { image_url: string } = req.query;
 
-  // Start the Server
-  app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
-      console.log( `press CTRL+C to stop server` );
-  } );
+    // 1. TO VALIDATE THE IMAGE'S URL
+    if (!image_url) {
+      return res.status(400)
+        .send(`image_url is required`);
+    }
+    const image : Promise<string> = filterImageFromURL(image_url);
+
+    image.then(img => {
+      res.sendFile(img, () => {
+        const deleteImage: Array<string> = new Array(img);
+        deleteLocalFiles(deleteImage);
+      });
+    }).catch(error => {
+      res.status(404).send({ message: "image not found" });
+    });
+  },
+
+    //! END @TODO1
+
+    // Root Endpoint
+    // Displays a simple message to the user
+    app.get("/", async (req: Request, res: Response) => {
+    res.send("try GET /filteredimage?image_url={{}}")
+  }));
+
+
+    // Start the Server
+    app.listen(port, () => {
+    console.log(`server running http://localhost:${port}`);
+    console.log(`press CTRL+C to stop server`);
+  });
 })();
